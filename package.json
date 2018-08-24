@@ -1,0 +1,21 @@
+{
+  "name": "@01ht/ht-organization-editor",
+  "version": "1.0.0",
+  "main": "ht-organization-editor.js",
+  "repository": "01ht/ht-organization-editor",
+  "author": "01ht Ltd",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@polymer/lit-element": "^0.5.1",
+    "@polymer/paper-input": "^3.0.0-pre.18",
+    "@polymer/iron-icon": "^3.0.0-pre.18",
+    "@polymer/paper-checkbox": "^3.0.0-pre.18",
+    "@polymer/iron-iconset-svg": "^3.0.0-pre.18",
+    "@polymer/paper-button": "^3.0.0-pre.18",
+    "@polymer/paper-icon-button": "^3.0.0-pre.18",
+    "@polymer/paper-toggle-button": "^3.0.0-pre.18",
+    "@polymer/paper-spinner": "^3.0.0-pre.18",
+    "@01ht/ht-wysiwyg": "^1.0.0",
+    "@01ht/ht-client-helper-functions": "^1.0.0"
+  }
+}
