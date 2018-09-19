@@ -5,8 +5,9 @@ import "@polymer/paper-dialog/paper-dialog.js";
 import "@polymer/paper-dialog-scrollable/paper-dialog-scrollable.js";
 import "@01ht/ht-storage";
 
-class HTOrganizationEditorImage extends LitElement {
-  _render({ data }) {
+class HTOrganizationEditorAvatar extends LitElement {
+  render() {
+    const { data } = this;
     return html`
       <style>
         :host {
@@ -65,9 +66,9 @@ class HTOrganizationEditorImage extends LitElement {
         }
       </style>
       <div id="container"> 
-        <p>512x512 | .jpg</p>
+        <p>512x512 | .png .jpg</p>
         <div id="actions">
-            <paper-button id="choose" on-click=${e => {
+            <paper-button id="choose" @click=${e => {
               this._showDialog();
             }}" raised>
                 Выбрать</paper-button>
@@ -89,9 +90,9 @@ class HTOrganizationEditorImage extends LitElement {
             </paper-dialog-scrollable>
             <div class="buttons">
             <paper-button id="close" dialog-dismiss>Закрыть</paper-button>
-            <paper-button id="select" dialog-confirm on-click="${e => {
+            <paper-button id="select" dialog-confirm @click=${e => {
               this._insertImage();
-            }}">Выбрать</paper-button>
+            }}>Выбрать</paper-button>
             </div>
         </paper-dialog>
 
@@ -100,11 +101,11 @@ class HTOrganizationEditorImage extends LitElement {
   }
 
   static get is() {
-    return "ht-organization-editor-image";
+    return "ht-organization-editor-avatar";
   }
 
   static get properties() {
-    return { data: Object };
+    return { data: { type: Object } };
   }
 
   constructor() {
@@ -129,7 +130,11 @@ class HTOrganizationEditorImage extends LitElement {
     let items = this.storage.getSelectedItems();
     if (items.length === 0) return;
     let item = items[0];
-    if (item.format === "jpg" && item.width === 512 && item.height === 512) {
+    if (
+      (item.format === "jpg" || item.format === "png") &&
+      item.width === 512 &&
+      item.height === 512
+    ) {
       this.data = item;
     } else {
       this.dispatchEvent(
@@ -149,4 +154,7 @@ class HTOrganizationEditorImage extends LitElement {
   }
 }
 
-customElements.define(HTOrganizationEditorImage.is, HTOrganizationEditorImage);
+customElements.define(
+  HTOrganizationEditorAvatar.is,
+  HTOrganizationEditorAvatar
+);

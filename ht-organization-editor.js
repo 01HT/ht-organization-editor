@@ -3,9 +3,11 @@ import { LitElement, html } from "@polymer/lit-element";
 import "@polymer/paper-input/paper-input.js";
 import "@01ht/ht-wysiwyg";
 import "@01ht/ht-spinner";
-import "./ht-organization-editor-image.js";
+import "./ht-organization-editor-avatar.js";
+
 class HTItemEditor extends LitElement {
-  _render({ orgId, loading, loadingText }) {
+  render() {
+    const { orgId, loading, loadingText } = this;
     return html`
       <style>
         :host {
@@ -39,12 +41,13 @@ class HTItemEditor extends LitElement {
           display:none;
         }
       </style>
-      <ht-spinner page text$=${loadingText} hidden?=${!loading}></ht-spinner>
-      <div id="container" hidden?=${loading}>
+      <ht-spinner page text=${loadingText} ?hidden=${!loading}></ht-spinner>
+      <div id="container" ?hidden=${loading}>
         <h1>${
           orgId === "" ? "Добавить организацию" : "Настройки организации"
         }</h1>
         <paper-input id="displayName" label="Название"></paper-input>
+        <paper-input id="email" label="Адрес электронной почты"></paper-input>
         <paper-input id="country" label="Страна"></paper-input>
         <paper-input id="city" label="Город" auto-validate></paper-input>
         <paper-input id="phone" label="Телефон"></paper-input>
@@ -55,14 +58,14 @@ class HTItemEditor extends LitElement {
         <paper-input id="github" label="GitHub"></paper-input>
         <section>
           <h4>Логотип организации (обязательно)</h4>
-          <ht-organization-editor-image id="image"></ht-organization-editor-image>
+          <ht-organization-editor-avatar id="avatar"></ht-organization-editor-avatar>
         </section>
         <section>
           <h4>Об организации</h4>
           <ht-wysiwyg id="description"></ht-wysiwyg>
         </section>
         <section id="actions">
-          <paper-button on-click=${e => {
+          <paper-button @click=${e => {
             orgId === "" ? this.add() : this.save();
           }}>${orgId === "" ? "Добавить" : "Сохранить"}</paper-button>
         </section>
@@ -76,9 +79,9 @@ class HTItemEditor extends LitElement {
 
   static get properties() {
     return {
-      orgId: String,
-      loading: Boolean,
-      loadingText: String
+      orgId: { type: String },
+      loading: { type: Boolean },
+      loadingText: { type: String }
     };
   }
 
@@ -106,6 +109,7 @@ class HTItemEditor extends LitElement {
   async _setDefaultData() {
     try {
       this.shadowRoot.querySelector("#displayName").value = "";
+      this.shadowRoot.querySelector("#email").value = "";
       this.shadowRoot.querySelector("#country").value = "";
       this.shadowRoot.querySelector("#city").value = "";
       this.shadowRoot.querySelector("#phone").value = "";
@@ -114,7 +118,7 @@ class HTItemEditor extends LitElement {
       this.shadowRoot.querySelector("#facebook").value = "";
       this.shadowRoot.querySelector("#twitter").value = "";
       this.shadowRoot.querySelector("#github").value = "";
-      this.shadowRoot.querySelector("#image").reset();
+      this.shadowRoot.querySelector("#avatar").reset();
       this.shadowRoot.querySelector("#description").setDefaultData();
     } catch (err) {
       console.log("_setDefaultData: " + err.message);
@@ -125,6 +129,7 @@ class HTItemEditor extends LitElement {
     try {
       let orgData = await this._getOrgData(orgId);
       this.shadowRoot.querySelector("#displayName").value = orgData.displayName;
+      this.shadowRoot.querySelector("#email").value = orgData.email;
       this.shadowRoot.querySelector("#country").value = orgData.country;
       this.shadowRoot.querySelector("#city").value = orgData.city;
       this.shadowRoot.querySelector("#phone").value = orgData.phone;
@@ -133,7 +138,7 @@ class HTItemEditor extends LitElement {
       this.shadowRoot.querySelector("#facebook").value = orgData.facebook;
       this.shadowRoot.querySelector("#twitter").value = orgData.twitter;
       this.shadowRoot.querySelector("#github").value = orgData.github;
-      this.shadowRoot.querySelector("#image").data = orgData.image;
+      this.shadowRoot.querySelector("#avatar").data = orgData.avatar;
       this.shadowRoot
         .querySelector("#description")
         .setData(orgData.description);
@@ -153,6 +158,7 @@ class HTItemEditor extends LitElement {
       org.sales = 0;
       org.verified = false;
       org.displayName = this.shadowRoot.querySelector("#displayName").value;
+      org.email = this.shadowRoot.querySelector("#email").value;
       org.country = this.shadowRoot.querySelector("#country").value;
       org.city = this.shadowRoot.querySelector("#city").value;
       org.phone = this.shadowRoot.querySelector("#phone").value;
@@ -161,7 +167,7 @@ class HTItemEditor extends LitElement {
       org.facebook = this.shadowRoot.querySelector("#facebook").value;
       org.twitter = this.shadowRoot.querySelector("#twitter").value;
       org.github = this.shadowRoot.querySelector("#github").value;
-      org.image = this.shadowRoot.querySelector("#image").data || {};
+      org.avatar = this.shadowRoot.querySelector("#avatar").data || {};
       org.description = this.shadowRoot.querySelector("#description").getData();
       await firebase
         .firestore()
@@ -187,6 +193,7 @@ class HTItemEditor extends LitElement {
       let updates = {};
       updates.updated = firebase.firestore.FieldValue.serverTimestamp();
       updates.displayName = this.shadowRoot.querySelector("#displayName").value;
+      updates.email = this.shadowRoot.querySelector("#email").value;
       updates.country = this.shadowRoot.querySelector("#country").value;
       updates.city = this.shadowRoot.querySelector("#city").value;
       updates.phone = this.shadowRoot.querySelector("#phone").value;
@@ -195,7 +202,7 @@ class HTItemEditor extends LitElement {
       updates.facebook = this.shadowRoot.querySelector("#facebook").value;
       updates.twitter = this.shadowRoot.querySelector("#twitter").value;
       updates.github = this.shadowRoot.querySelector("#github").value;
-      updates.image = this.shadowRoot.querySelector("#image").data || {};
+      updates.avatar = this.shadowRoot.querySelector("#avatar").data || {};
       updates.description = this.shadowRoot
         .querySelector("#description")
         .getData();
