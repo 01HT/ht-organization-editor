@@ -11,8 +11,8 @@
     "@polymer/paper-button": "^3.0.1",
     "@polymer/paper-dialog": "^3.0.1",
     "@polymer/paper-dialog-scrollable": "^3.0.1",
-    "@01ht/ht-wysiwyg": "^1.0.0",
-    "@01ht/ht-storage": "^1.0.0",
-    "@01ht/ht-spinner": "^1.0.0"
+    "@01ht/ht-wysiwyg": "01ht/ht-wysiwyg",
+    "@01ht/ht-storage": "01ht/ht-storage",
+    "@01ht/ht-spinner": "01ht/ht-spinner"
   }
 }
