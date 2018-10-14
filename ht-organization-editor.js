@@ -9,20 +9,8 @@ class HTItemEditor extends LitElement {
   render() {
     const { orgId, loading, loadingText } = this;
     return html`
+      ${SharedStyles}
       <style>
-        :host {
-          display: block;
-          position:relative;
-          box-sizing:border-box;
-        }
-
-        paper-button {
-          background: var(--accent-color);
-          margin:0;
-          color: #fff;
-          padding: 8px 16px;
-        }
-
         section {
           margin-top:32px;
         }
@@ -37,15 +25,22 @@ class HTItemEditor extends LitElement {
           margin-top:32px;
         }
 
-        #container[hidden], ht-spinner[hidden] {
+        #link {
+          margin-bottom: 8px;
+        }
+
+        #container[hidden], ht-spinner[hidden], [hidden] {
           display:none;
         }
       </style>
       <ht-spinner page text=${loadingText} ?hidden=${!loading}></ht-spinner>
       <div id="container" ?hidden=${loading}>
-        <h1>${
+        <h1 class="mdc-typography--headline5">${
           orgId === "" ? "Добавить организацию" : "Настройки организации"
         }</h1>
+        <div id="link" ?hidden=${orgId === ""}>
+          <a href="/organization/${orgId}">Ссылка на страницу организации</a>
+        </div>
         <paper-input id="displayName" label="Название"></paper-input>
         <paper-input id="email" label="Адрес электронной почты"></paper-input>
         <paper-input id="country" label="Страна"></paper-input>

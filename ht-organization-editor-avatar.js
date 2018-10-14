@@ -9,24 +9,8 @@ class HTOrganizationEditorAvatar extends LitElement {
   render() {
     const { data } = this;
     return html`
+      ${SharedStyles}
       <style>
-        :host {
-          display: block;
-          position:relative;
-          box-sizing:border-box;
-        }
-
-        #select {
-          color:var(--accent-color);
-        }
-
-        paper-button {
-            margin:8px 0 0 0;
-            color:var(--secondary-text-color);
-            font-weight:500;
-            padding: 8px 16px;
-        }
-        
         paper-dialog {
             width: 95%;
             max-width: 800px;
@@ -48,8 +32,11 @@ class HTOrganizationEditorAvatar extends LitElement {
 
         #choose {
             margin-right:8px;
-            color: #fff;
-            background: var(--accent-color);
+        }
+
+        #close {
+          background: #fff;
+          color: var(--accent-color);
         }
 
         #img-container {
@@ -58,7 +45,7 @@ class HTOrganizationEditorAvatar extends LitElement {
         }
 
         .buttons {
-          padding:8px 24px 16px 24px;
+          padding:16px 24px 16px 24px;
         }
 
         [hidden] {
