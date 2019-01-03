@@ -3,11 +3,19 @@ import { LitElement, html } from "@polymer/lit-element";
 import "@polymer/paper-input/paper-input.js";
 import "@01ht/ht-wysiwyg";
 import "@01ht/ht-spinner";
+import "@polymer/iron-iconset-svg";
+import "@polymer/iron-icon";
+import "@polymer/paper-tooltip";
 import "./ht-organization-editor-avatar.js";
+
+import {
+  // callTestHTTPFunction,
+  callFirebaseHTTPFunction
+} from "@01ht/ht-client-helper-functions";
 
 class HTItemEditor extends LitElement {
   render() {
-    const { orgId, loading, loadingText } = this;
+    const { orgId, loading, loadingText, orgData } = this;
     return html`
       ${SharedStyles}
       <style>
@@ -17,6 +25,31 @@ class HTItemEditor extends LitElement {
 
         paper-input {
           max-width: 500px;
+          width: 100%;
+        }
+
+        #nameInURLContainer {
+          display:flex;
+          align-items:center;
+          position:relative;
+          max-width: 500px;
+          width: 100%;
+        }
+
+        #name-in-url {
+          margin-right: 32px;
+        }
+
+        .warning {
+          color: var(--accent-color);
+          position: absolute;
+          top: 28px;
+          height: 24px;
+          right:0;
+          bottom:0;
+          left:0;
+          display:flex;
+          justify-content:flex-end;
         }
 
         #actions {
@@ -33,15 +66,41 @@ class HTItemEditor extends LitElement {
           display:none;
         }
       </style>
+      <iron-iconset-svg size="24" name="ht-organization-editor">
+        <svg>
+          <defs>
+              <g id="warning"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"></path></g>   
+          </defs>
+        </svg>
+      </iron-iconset-svg>
       <ht-spinner page text=${loadingText} ?hidden=${!loading}></ht-spinner>
       <div id="container" ?hidden=${loading}>
         <h1 class="mdc-typography--headline5">${
           orgId === "" ? "Добавить организацию" : "Настройки организации"
         }</h1>
-        <div id="link" ?hidden=${orgId === ""}>
-          <a href="/organization/${orgId}">Ссылка на страницу организации</a>
-        </div>
+        ${
+          orgData && orgData.organizationNumber
+            ? html`
+        <div id="link">
+          <a href="/organization/${orgData.nameInURL}/${
+                orgData.organizationNumber
+              }">Ссылка на страницу организации</a>
+        </div>`
+            : null
+        }
         <paper-input id="displayName" label="Название"></paper-input>
+        <div id="nameInURLContainer">
+          <div class="warning">
+              <iron-icon icon="ht-organization-editor:warning"></iron-icon>
+              <paper-tooltip>
+              Изменение влечет за собой изменение всех ссылок в которых задействован данный параметр. Существующие ссылки в интернете с параметром, станут недоступными и будут выдавать ошибку 404. Поисковым системам потребуется время для повторного индексирования ссылок и размещения информации в поисковой выдаче. Соответственно частое изменение данного параметра крайне не рекомендуется.
+            </paper-tooltip>
+          </div>
+          <paper-input id="name-in-url" label="Название в URL" placeholder="my-organization-name-7" allowed-pattern="^[0-9a-z\-]+$" auto-validate>
+            <div slot="prefix">/organization/</div>
+            <div slot="suffix"></div>
+          </paper-input>
+        </div>
         <paper-input id="email" label="Адрес электронной почты"></paper-input>
         <paper-input id="country" label="Страна"></paper-input>
         <paper-input id="city" label="Город" auto-validate></paper-input>
@@ -76,7 +135,8 @@ class HTItemEditor extends LitElement {
     return {
       orgId: { type: String },
       loading: { type: Boolean },
-      loadingText: { type: String }
+      loadingText: { type: String },
+      orgData: { type: Object }
     };
   }
 
@@ -94,8 +154,8 @@ class HTItemEditor extends LitElement {
         .collection("organizations")
         .doc(orgId)
         .get();
-      let itemData = snapshot.data();
-      return itemData;
+      let orgData = snapshot.data();
+      return orgData;
     } catch (err) {
       console.log("_setOrgData: " + err.message);
     }
@@ -104,6 +164,10 @@ class HTItemEditor extends LitElement {
   async _setDefaultData() {
     try {
       this.shadowRoot.querySelector("#displayName").value = "";
+      this.shadowRoot.querySelector("#name-in-url").value = "";
+      this.shadowRoot.querySelector(
+        "#name-in-url [slot='suffix']"
+      ).innerHTML = ``;
       this.shadowRoot.querySelector("#email").value = "";
       this.shadowRoot.querySelector("#country").value = "";
       this.shadowRoot.querySelector("#city").value = "";
@@ -124,6 +188,10 @@ class HTItemEditor extends LitElement {
     try {
       let orgData = await this._getOrgData(orgId);
       this.shadowRoot.querySelector("#displayName").value = orgData.displayName;
+      this.shadowRoot.querySelector("#name-in-url").value = orgData.nameInURL;
+      this.shadowRoot.querySelector(
+        "#name-in-url [slot='suffix']"
+      ).innerHTML = `/${orgData.organizationNumber}`;
       this.shadowRoot.querySelector("#email").value = orgData.email;
       this.shadowRoot.querySelector("#country").value = orgData.country;
       this.shadowRoot.querySelector("#city").value = orgData.city;
@@ -137,6 +205,7 @@ class HTItemEditor extends LitElement {
       this.shadowRoot
         .querySelector("#description")
         .setData(orgData.description);
+      this.orgData = orgData;
     } catch (err) {
       console.log("_setOrgData: " + err.message);
     }
@@ -147,12 +216,12 @@ class HTItemEditor extends LitElement {
       this.loading = true;
       this.loadingText = "Создание организации";
       let org = {};
-      org.created = firebase.firestore.FieldValue.serverTimestamp();
-      org.updated = firebase.firestore.FieldValue.serverTimestamp();
       org.ownerId = firebase.auth().currentUser.uid;
       org.sales = 0;
       org.verified = false;
       org.displayName = this.shadowRoot.querySelector("#displayName").value;
+      org.nameInURL =
+        this.shadowRoot.querySelector("#name-in-url").value || "no-name";
       org.email = this.shadowRoot.querySelector("#email").value;
       org.country = this.shadowRoot.querySelector("#country").value;
       org.city = this.shadowRoot.querySelector("#city").value;
@@ -164,17 +233,41 @@ class HTItemEditor extends LitElement {
       org.github = this.shadowRoot.querySelector("#github").value;
       org.avatar = this.shadowRoot.querySelector("#avatar").data || {};
       org.description = this.shadowRoot.querySelector("#description").getData();
-      await firebase
-        .firestore()
-        .collection("organizations")
-        .add(org);
-      this.dispatchEvent(
-        new CustomEvent("on-add", {
-          bubbles: true,
-          composed: true
-        })
-      );
+
+      let response = await callFirebaseHTTPFunction({
+        name: "httpsOrganizationsCreateOrganizationIndex",
+        authorization: true,
+        options: {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            orgData: org
+          })
+        }
+      });
       this.loading = false;
+      if (response.created === true) {
+        this.dispatchEvent(
+          new CustomEvent("on-add", {
+            bubbles: true,
+            composed: true
+          })
+        );
+      } else {
+        this.dispatchEvent(
+          new CustomEvent("show-toast", {
+            bubbles: true,
+            composed: true,
+            detail: {
+              text: `При создании организации возникла ошибка: ${
+                response.error
+              }`
+            }
+          })
+        );
+      }
     } catch (err) {
       console.log("add: " + err.message);
     }
@@ -188,6 +281,8 @@ class HTItemEditor extends LitElement {
       let updates = {};
       updates.updated = firebase.firestore.FieldValue.serverTimestamp();
       updates.displayName = this.shadowRoot.querySelector("#displayName").value;
+      updates.nameInURL =
+        this.shadowRoot.querySelector("#name-in-url").value || "no-name";
       updates.email = this.shadowRoot.querySelector("#email").value;
       updates.country = this.shadowRoot.querySelector("#country").value;
       updates.city = this.shadowRoot.querySelector("#city").value;
