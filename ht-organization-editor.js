@@ -187,6 +187,7 @@ class HTItemEditor extends LitElement {
   async _setOrgData(orgId) {
     try {
       let orgData = await this._getOrgData(orgId);
+      if (orgData === undefined) return;
       this.shadowRoot.querySelector("#displayName").value = orgData.displayName;
       this.shadowRoot.querySelector("#name-in-url").value = orgData.nameInURL;
       this.shadowRoot.querySelector(
