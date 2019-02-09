@@ -1,5 +1,5 @@
 "use strict";
-import { LitElement, html } from "@polymer/lit-element";
+import { LitElement, html, css } from "lit-element";
 import "@polymer/paper-input/paper-input.js";
 import "@01ht/ht-wysiwyg";
 import "@01ht/ht-spinner";
@@ -14,11 +14,9 @@ import {
 } from "@01ht/ht-client-helper-functions";
 
 class HTItemEditor extends LitElement {
-  render() {
-    const { orgId, loading, loadingText, orgData } = this;
-    return html`
-      ${SharedStyles}
-      <style>
+  static styles = [
+    window.SharedStyles,
+    css`<style>
         section {
           margin-top:32px;
         }
@@ -65,7 +63,12 @@ class HTItemEditor extends LitElement {
         #container[hidden], ht-spinner[hidden], [hidden] {
           display:none;
         }
-      </style>
+      </style>`
+  ];
+
+  render() {
+    const { orgId, loading, loadingText, orgData } = this;
+    return html`
       <iron-iconset-svg size="24" name="ht-organization-editor">
         <svg>
           <defs>
@@ -73,8 +76,8 @@ class HTItemEditor extends LitElement {
           </defs>
         </svg>
       </iron-iconset-svg>
-      <ht-spinner page text=${loadingText} ?hidden=${!loading}></ht-spinner>
-      <div id="container" ?hidden=${loading}>
+      <ht-spinner page text="${loadingText}" ?hidden="${!loading}"></ht-spinner>
+      <div id="container" ?hidden="${loading}">
         <h1 class="mdc-typography--headline5">${
           orgId === "" ? "Добавить организацию" : "Настройки организации"
         }</h1>
@@ -119,16 +122,12 @@ class HTItemEditor extends LitElement {
           <ht-wysiwyg id="description"></ht-wysiwyg>
         </section>
         <section id="actions">
-          <paper-button @click=${e => {
+          <paper-button @click="${e => {
             orgId === "" ? this.add() : this.save();
-          }}>${orgId === "" ? "Добавить" : "Сохранить"}</paper-button>
+          }}">${orgId === "" ? "Добавить" : "Сохранить"}</paper-button>
         </section>
       </div>
 `;
-  }
-
-  static get is() {
-    return "ht-organization-editor";
   }
 
   static get properties() {
@@ -321,4 +320,4 @@ class HTItemEditor extends LitElement {
   }
 }
 
-customElements.define(HTItemEditor.is, HTItemEditor);
+customElements.define("ht-organization-editor", HTItemEditor);

@@ -1,16 +1,14 @@
 "use strict";
-import { LitElement, html } from "@polymer/lit-element";
+import { LitElement, html, css } from "lit-element";
 import "@polymer/paper-button";
 import "@polymer/paper-dialog/paper-dialog.js";
 import "@polymer/paper-dialog-scrollable/paper-dialog-scrollable.js";
 import "@01ht/ht-storage";
 
 class HTOrganizationEditorAvatar extends LitElement {
-  render() {
-    const { data } = this;
-    return html`
-      ${SharedStyles}
-      <style>
+  static styles = [
+    window.SharedStyles,
+    css`<style>
         paper-dialog {
             width: 95%;
             max-width: 800px;
@@ -51,13 +49,16 @@ class HTOrganizationEditorAvatar extends LitElement {
         [hidden] {
             display: none;
         }
-      </style>
+      </style>`
+  ];
+
+  render() {
+    const { data } = this;
+    return html`
       <div id="container"> 
         <p>512x512 | .png .jpg</p>
         <div id="actions">
-            <paper-button id="choose" @click=${e => {
-              this._showDialog();
-            }}" raised>
+            <paper-button id="choose" @click="${this._showDialog}" raised>
                 Выбрать</paper-button>
         </div>
         ${
@@ -77,18 +78,14 @@ class HTOrganizationEditorAvatar extends LitElement {
             </paper-dialog-scrollable>
             <div class="buttons">
             <paper-button id="close" dialog-dismiss>Закрыть</paper-button>
-            <paper-button id="select" dialog-confirm @click=${e => {
-              this._insertImage();
-            }}>Выбрать</paper-button>
+            <paper-button id="select" dialog-confirm @click="${
+              this._insertImage
+            }">Выбрать</paper-button>
             </div>
         </paper-dialog>
 
       </div>
 `;
-  }
-
-  static get is() {
-    return "ht-organization-editor-avatar";
   }
 
   static get properties() {
@@ -142,6 +139,6 @@ class HTOrganizationEditorAvatar extends LitElement {
 }
 
 customElements.define(
-  HTOrganizationEditorAvatar.is,
+  "ht-organization-editor-avatar",
   HTOrganizationEditorAvatar
 );
