@@ -13,12 +13,15 @@ import {
   callFirebaseHTTPFunction
 } from "@01ht/ht-client-helper-functions";
 
+import { styles } from "@01ht/ht-theme/styles";
+
 class HTItemEditor extends LitElement {
-  static styles = [
-    window.SharedStyles,
-    css`<style>
+  static get styles() {
+    return [
+      styles,
+      css`
         section {
-          margin-top:32px;
+          margin-top: 32px;
         }
 
         paper-input {
@@ -27,9 +30,9 @@ class HTItemEditor extends LitElement {
         }
 
         #nameInURLContainer {
-          display:flex;
-          align-items:center;
-          position:relative;
+          display: flex;
+          align-items: center;
+          position: relative;
           max-width: 500px;
           width: 100%;
         }
@@ -43,28 +46,31 @@ class HTItemEditor extends LitElement {
           position: absolute;
           top: 28px;
           height: 24px;
-          right:0;
-          bottom:0;
-          left:0;
-          display:flex;
-          justify-content:flex-end;
+          right: 0;
+          bottom: 0;
+          left: 0;
+          display: flex;
+          justify-content: flex-end;
         }
 
         #actions {
           display: flex;
           justify-content: flex-end;
-          margin-top:32px;
+          margin-top: 32px;
         }
 
         #link {
           margin-bottom: 8px;
         }
 
-        #container[hidden], ht-spinner[hidden], [hidden] {
-          display:none;
+        #container[hidden],
+        ht-spinner[hidden],
+        [hidden] {
+          display: none;
         }
-      </style>`
-  ];
+      `
+    ];
+  }
 
   render() {
     const { orgId, loading, loadingText, orgData } = this;
