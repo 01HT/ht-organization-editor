@@ -222,8 +222,6 @@ class HTItemEditor extends LitElement {
       this.loading = true;
       this.loadingText = "Создание организации";
       let org = {};
-      org.created = firebase.firestore.FieldValue.serverTimestamp();
-      org.updated = firebase.firestore.FieldValue.serverTimestamp();
       org.ownerId = firebase.auth().currentUser.uid;
       org.sales = 0;
       org.verified = false;
@@ -317,7 +315,7 @@ class HTItemEditor extends LitElement {
       );
       this.loading = false;
     } catch (err) {
-      console.log("add: " + err.message);
+      console.log("save: " + err.message);
     }
   }
 
