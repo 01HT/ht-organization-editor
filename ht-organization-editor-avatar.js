@@ -68,7 +68,7 @@ class HTOrganizationEditorAvatar extends LitElement {
         ${
           data.public_id
             ? html`<div id="img-container"><img src="${
-                window.cloudinaryURL
+                window.appConfig.cloudinary.url
               }/image/upload/c_scale,f_auto,w_512/v${data.version}/${
                 data.public_id
               }.jpg">
